@@ -1,19 +1,31 @@
 import { useEffect, useRef, useState } from "react";
+import { db } from "../../services/db";
 
-export function NewTodoForm({ createTodo }) {
+export function NewTodoForm() {
   const inputRef = useRef(null);
   const [title, setTitle] = useState("");
-  function onHandlecreateTodo(event) {
+
+  async function onHandleCreateTodo(event) {
     event.preventDefault();
-    createTodo(title);
+    try {
+      await db.todos.add({
+        title,
+        isCompleted: false,
+        dateCreated: Date.now(),
+      });
+    } catch (error) {
+      console.log(`Failed to add "${title}" to todos`);
+    }
     setTitle("");
     inputRef.current.focus();
   }
+
   useEffect(() => {
     inputRef.current.focus();
   }, []);
+
   return (
-    <form onSubmit={onHandlecreateTodo}>
+    <form onSubmit={onHandleCreateTodo}>
       <label htmlFor="todo"></label>
       <input
         ref={inputRef}
