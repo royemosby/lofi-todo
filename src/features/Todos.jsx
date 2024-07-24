@@ -1,55 +1,31 @@
 import { useState, useEffect } from "react";
 import { styled } from "styled-components";
-import ShortUniqueId from "short-unique-id";
 import { NewTodoForm } from "./todos/NewTodoForm";
 import { TodoList } from "./todos/TodoList";
 import { FilterTodos } from "./todos/FilterTodos";
 import { SortTodos } from "./todos/SortTodos";
-
-//TODO figure out best location for this to be instantiated
-const { randomUUID } = new ShortUniqueId({ length: 10 });
+import { useLiveQuery } from "dexie-react-hooks";
+import { db } from "../services/db";
 
 export function Todos() {
-  const [todos, setTodos] = useState([]);
+  const todos = useLiveQuery(() => db.todos.toArray());
   const [visibleTodos, setVisibleTodos] = useState([]);
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("alpha");
 
-  function createTodo(title) {
-    setTodos([
-      ...todos,
-      {
-        title: title,
-        id: randomUUID(),
-        dateCreated: Date.now(),
-        isCompleted: false,
-      },
-    ]);
-  }
-  function updateTodo(todo) {
-    const updatedTodos = todos.map((t) => {
-      if (t.id === todo.id) {
-        return Object.assign({}, todo, { isCompleted: todo.isCompleted });
-      }
-      return t;
-    });
-    setTodos(updatedTodos);
-  }
-  function deleteTodo(id) {
-    setTodos(() => {
-      return todos.filter((todo) => todo.id !== id);
-    });
-  }
-
   useEffect(() => {
     let sortedTodos;
+
+    if (!todos) {
+      return;
+    }
 
     switch (sort) {
       case "alpha":
         sortedTodos = todos.sort((a, b) => {
-          if (a.title === b.title) {
+          if (a.title.toLowerCase() === b.title.toLowerCase()) {
             return 0;
-          } else if (a.title > b.title) {
+          } else if (a.title.toLowerCase() > b.title.toLowerCase()) {
             return 1;
           } else {
             return -1;
@@ -100,16 +76,14 @@ export function Todos() {
   return (
     <Main>
       <FormFilterWrapper>
-        <NewTodoForm createTodo={createTodo} />
+        <NewTodoForm />
         <FilterTodos setFilter={setFilter} currentFilter={filter} />
       </FormFilterWrapper>
       <ListSortWrapper>
-        <TodoList
-          todos={visibleTodos}
-          updateTodo={updateTodo}
-          deleteTodo={deleteTodo}
-        />
-        {todos.length > 1 && <SortTodos currentSort={sort} setSort={setSort} />}
+        <TodoList todos={visibleTodos} />
+        {todos?.length > 1 && (
+          <SortTodos currentSort={sort} setSort={setSort} />
+        )}
       </ListSortWrapper>
     </Main>
   );
