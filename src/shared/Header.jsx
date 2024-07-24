@@ -3,7 +3,9 @@ import { styled } from "styled-components";
 export function Header() {
   return (
     <header>
-      <Title>YA Todo List</Title>
+      <Title>
+        <a href="https://localfirstweb.dev/">LoFi</a> Todo List
+      </Title>
     </header>
   );
 }
