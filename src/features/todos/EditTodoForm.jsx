@@ -1,15 +1,21 @@
 import { useRef, useState } from "react";
 import styled from "styled-components";
+import { db } from "../../services/db";
 
-export function EditTodoForm({ todo, setIsEditing, updateTodo }) {
+export function EditTodoForm({ todo, setIsEditing }) {
   const inputRef = useRef(null);
   const [title, setTitle] = useState(todo.title);
 
-  function onUpdateTodo(event) {
+  async function onUpdateTodo(event) {
     event.preventDefault();
-    updateTodo(Object.assign({}, todo, { title: title }));
     setIsEditing(false);
+    try {
+      await db.todos.update(todo.id, { title: title });
+    } catch {
+      console.log(`Failed to update ${todo.id}`);
+    }
   }
+
   return (
     <StyledForm>
       <button onClick={onUpdateTodo}>Update</button>

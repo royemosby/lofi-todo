@@ -2,19 +2,27 @@ import { useRef, useState, useEffect } from "react";
 import { styled } from "styled-components";
 import { EditTodoForm } from "./EditTodoForm";
 import { CheckSquare, Square, XCircle } from "react-feather";
+import { db } from "../../services/db";
 
-export function Todo({ todo, updateTodo, deleteTodo }) {
+export function Todo({ todo }) {
   const [isEditing, setIsEditing] = useState(false);
   const ref = useRef(null);
 
-  //TODO refactor to toggle state
-  function toggleIsCompleted() {
-    updateTodo(Object.assign({}, todo, { isCompleted: !todo.isCompleted }));
+  async function toggleIsCompleted() {
+    try {
+      await db.todos.update(todo.id, { isCompleted: !todo.isCompleted });
+    } catch (error) {
+      console.log(`Failed to update ${todo.id}`);
+    }
   }
-  function handleDeleteTodo() {
-    deleteTodo(todo.id);
+  async function handleDeleteTodo() {
+    try {
+      await db.todos.delete(todo.id);
+    } catch {
+      console.log(`Failed to delete ${todo.id}`);
+    }
   }
-  function toggleIsEditing(event) {
+  function doubleClickEdit(event) {
     if (event.detail === 2) {
       setIsEditing(!isEditing);
     }
@@ -35,18 +43,14 @@ export function Todo({ todo, updateTodo, deleteTodo }) {
   return (
     <li ref={ref}>
       {isEditing ? (
-        <EditTodoForm
-          todo={todo}
-          updateTodo={updateTodo}
-          setIsEditing={setIsEditing}
-        />
+        <EditTodoForm todo={todo} setIsEditing={setIsEditing} />
       ) : (
         <StyledTodo>
           <CompleteButton onClick={toggleIsCompleted}>
             {todo.isCompleted ? <CheckSquare /> : <Square />}
           </CompleteButton>
           <StyledSpan
-            onClick={toggleIsEditing}
+            onClick={doubleClickEdit}
             className={todo.isCompleted && "completed"}
           >
             {todo.title}
