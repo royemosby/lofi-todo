@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { toast } from "react-toastify";
 import styled from "styled-components";
 import { db } from "../../services/db";
 
@@ -12,7 +13,7 @@ export function EditTodoForm({ todo, setIsEditing }) {
     try {
       await db.todos.update(todo.id, { title: title });
     } catch {
-      console.log(`Failed to update ${todo.id}`);
+      toast.error(`Failed to update ${todo.id}`);
     }
   }
 

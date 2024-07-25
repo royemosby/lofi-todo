@@ -1,3 +1,5 @@
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import { Footer } from "./shared/Footer";
 import { Header } from "./shared/Header";
@@ -9,6 +11,7 @@ function App() {
       <Header />
       <Todos />
       <Footer />
+      <ToastContainer position="bottom-center" />
     </>
   );
 }

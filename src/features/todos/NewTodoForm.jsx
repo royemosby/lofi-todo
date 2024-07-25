@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { db } from "../../services/db";
+import { toast } from "react-toastify";
 
 export function NewTodoForm() {
   const inputRef = useRef(null);
@@ -14,7 +15,7 @@ export function NewTodoForm() {
         dateCreated: Date.now(),
       });
     } catch (error) {
-      console.log(`Failed to add "${title}" to todos`);
+      toast.error(`Failed to add "${title}" to todos`);
     }
     setTitle("");
     inputRef.current.focus();

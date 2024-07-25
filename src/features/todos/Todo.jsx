@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import { styled } from "styled-components";
 import { EditTodoForm } from "./EditTodoForm";
 import { CheckSquare, Square, XCircle } from "react-feather";
@@ -12,14 +13,14 @@ export function Todo({ todo }) {
     try {
       await db.todos.update(todo.id, { isCompleted: !todo.isCompleted });
     } catch (error) {
-      console.log(`Failed to update ${todo.id}`);
+      toast.error(`Failed to update ${todo.id}`);
     }
   }
   async function handleDeleteTodo() {
     try {
       await db.todos.delete(todo.id);
     } catch {
-      console.log(`Failed to delete ${todo.id}`);
+      toast.error(`Failed to delete ${todo.id}`);
     }
   }
   function doubleClickEdit(event) {
